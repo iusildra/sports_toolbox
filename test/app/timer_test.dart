@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sports_toolbox/app/timer/Timer.dart';
+import 'package:sports_toolbox/app/time/Timer.dart';
 
 void main() {
   testWidgets('Timer starts, pauses, resets, and sets duration correctly', (WidgetTester tester) async {
@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: TimerPage()));
 
     // Verify initial state
-    expect(find.text('01:00'), findsOneWidget);
+    expect(find.text('00:01:00'), findsOneWidget);
     expect(find.text('Start'), findsOneWidget);
     expect(find.text('Pause'), findsNothing);
 
@@ -37,7 +37,7 @@ void main() {
     await tester.pump();
 
     // Verify timer is reset
-    expect(find.text('01:00'), findsOneWidget);
+    expect(find.text('00:01:00'), findsOneWidget);
 
     // Set a new duration
     await tester.tap(find.text('Set Timer'));

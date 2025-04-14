@@ -30,6 +30,8 @@ class CustomGridTile extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
             child: Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
                     appIcon,
@@ -40,7 +42,7 @@ class CustomGridTile extends StatelessWidget {
                     appName,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 16
+                      fontSize: 16,
                     ),
                   ),
                 ],

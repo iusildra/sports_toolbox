@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:sports_toolbox/app/timer/duration_picker.dart';
+import 'package:sports_toolbox/app/time/duration_picker.dart';
 import 'package:sports_toolbox/utils/date_time_utils.dart';
 
 class TimerPage extends StatefulWidget {

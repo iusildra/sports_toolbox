@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sports_toolbox/app/counter/points_counter_1v1.dart';
 import 'package:sports_toolbox/app/grid_tile.dart';
-import 'package:sports_toolbox/app/stopwatch.dart';
-import 'package:sports_toolbox/app/timer/timer.dart';
-import 'package:sports_toolbox/components/custom_app_bar.dart';
+import 'package:sports_toolbox/app/time/stopwatch.dart';
+import 'package:sports_toolbox/app/time/timer.dart';
 import 'package:sports_toolbox/models/theme_model.dart';
 
 void main() {
@@ -53,6 +53,7 @@ class HomePage extends StatelessWidget {
   static const _apps = [
     ('Stopwatch', Icons.access_alarm, StopwatchPage()),
     ('Timer', Icons.timer, TimerPage()),
+    ('1v1 counter', Icons.sports_score, PointsCounter1v1Page())
   ];
 
   @override
@@ -61,14 +62,15 @@ class HomePage extends StatelessWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SimpleSliverAppBar(
-            title: title,
+          SliverAppBar(
+            title: Text(title),
             actions: [
               IconButton(
                 icon: const Icon(Icons.color_lens),
                 onPressed: () => context.read<ThemeModel>().switchColor(),
               ),
             ],
+            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           ),
           SliverGrid.extent(
             mainAxisSpacing: 10.0,
