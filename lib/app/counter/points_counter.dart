@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sports_toolbox/app/counter/athlete.dart';
 import 'package:sports_toolbox/app/counter/counter_setup.dart';
+import 'package:sports_toolbox/app/counter/penalty.dart';
+import 'package:sports_toolbox/app/counter/penalty_picket.dart';
+import 'package:sports_toolbox/components/dialogs.dart';
 
 class PointsCounterPage extends StatefulWidget {
   const PointsCounterPage({super.key});
@@ -25,13 +28,11 @@ class _PointsCounterState extends State<PointsCounterPage> {
       key: 0,
       name: 'Athlete 1',
       setup: CounterSettings(color: availableColors[0]),
-      score: 0,
     ),
     1: Athlete(
       key: 1,
       name: 'Athlete 2',
       setup: CounterSettings(color: availableColors[1]),
-      score: 0,
     ),
   };
 
@@ -42,7 +43,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
         ),
       );
 
-  void updateAthletes(Athlete athlete) {
+  void updateAthleteSetup(Athlete athlete) {
     setState(() => athleteScores[athlete.key] = athlete);
     resetScore();
   }
@@ -57,7 +58,17 @@ class _PointsCounterState extends State<PointsCounterPage> {
           ),
     );
     if (newAthletes != null) {
-      updateAthletes(newAthletes);
+      updateAthleteSetup(newAthletes);
+    }
+  }
+
+  void showPenaltyPickerDialog(Athlete athlete) async {
+    final penalty = await showDialog<PenaltyType>(
+      context: context,
+      builder: (context) => PenaltyPickerDialog(athlete: athlete),
+    );
+    if (penalty != null) {
+      setState(() => athlete.addPenalty(penalty));
     }
   }
 
@@ -67,35 +78,40 @@ class _PointsCounterState extends State<PointsCounterPage> {
   void resetScore() => setState(() {
     for (var a in athleteScores.values) {
       a.score = 0;
+      a.penalties.clear();
     }
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            title: const Text(appName),
-            stretch: true,
-            pinned: false,
-            floating: false,
+      appBar: AppBar(title: const Text(appName)),
+      body: Stack(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children:
+                athleteScores
+                    .map(
+                      (i, v) => MapEntry(i, athleteScoreColumn(v, i % 2 != 0)),
+                    )
+                    .values
+                    .toList(),
           ),
-          Container(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height
-            ),
-            child: Stack(
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: athleteScores.values.map(athleteScoreColumn).toList(),
-                ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: resetScore,
-                    child: const Text('Reset Scores'),
-                  ),
+                FilledButton.tonalIcon(
+                  onPressed:
+                      () => showDialog(
+                        context: context,
+                        builder:
+                            (context) =>
+                                CustomDialogs.confirmReset(context, resetScore),
+                      ),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reset'),
                 ),
               ],
             ),
@@ -105,50 +121,78 @@ class _PointsCounterState extends State<PointsCounterPage> {
     );
   }
 
-  Expanded athleteScoreColumn(Athlete athlete) => Expanded(
-    child: Container(
-      color: athlete.setup.color,
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                athlete.name,
-                style: TextTheme.of(
-                  context,
-                ).titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => showAthleteSetupDialog(athlete),
-              ),
-            ],
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => incrementScore(athlete.key),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    style: BorderStyle.solid,
-                    width: 2,
+  Expanded athleteScoreColumn(Athlete athlete, bool reverse) {
+    List<Widget> header = [
+      IconButton(
+        icon: const Icon(Icons.remove_circle_outline),
+        onPressed: () => showPenaltyPickerDialog(athlete),
+      ),
+      Text(
+        athlete.name,
+        style: TextTheme.of(
+          context,
+        ).titleLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () => showAthleteSetupDialog(athlete),
+      ),
+    ];
+    return Expanded(
+      child: Container(
+        color: athlete.setup.color,
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: reverse ? header.reversed.toList() : header,
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => incrementScore(athlete.key),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      style: BorderStyle.solid,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(
-                    athlete.score.toString(),
-                    style: TextTheme.of(context).displayLarge,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              athlete.scoreWithoutPenalties.toString(),
+                              style: TextTheme.of(context).displayLarge,
+                            ),
+                            athlete.penalties.isNotEmpty
+                                ? Text(
+                                  "(${athlete.score.toString()})",
+                                  style: TextTheme.of(context).titleLarge,
+                                )
+                                : const SizedBox(),
+                          ],
+                        ),
+                        Wrap(
+                          alignment: WrapAlignment.start,
+                          spacing: 8,
+                          runSpacing: 8,
+                          children:
+                              athlete.penalties.map((p) => p.asIcons).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

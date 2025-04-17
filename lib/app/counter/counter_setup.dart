@@ -48,7 +48,6 @@ class _CounterSetupState extends State<CounterSetup> {
           key: widget.athlete.key,
           name: _name,
           setup: CounterSettings(color: _color),
-          score: 0,
         ),
       );
     }
