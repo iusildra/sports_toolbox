@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_toolbox/app/counter/points_counter_1v1.dart';
+import 'package:sports_toolbox/app/counter/points_counter.dart';
 import 'package:sports_toolbox/app/grid_tile.dart';
 import 'package:sports_toolbox/app/time/stopwatch.dart';
 import 'package:sports_toolbox/app/time/timer.dart';
@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
   static const _apps = [
     ('Stopwatch', Icons.access_alarm, StopwatchPage()),
     ('Timer', Icons.timer, TimerPage()),
-    ('1v1 counter', Icons.sports_score, PointsCounter1v1Page())
+    ('1v1 counter', Icons.sports_score, PointsCounterPage())
   ];
 
   @override

@@ -36,13 +36,12 @@ class CustomGridTile extends StatelessWidget {
                   Icon(
                     appIcon,
                     color: Theme.of(context).colorScheme.onPrimary,
-                    size: 48,
+                    size: Theme.of(context).textTheme.displaySmall?.fontSize,
                   ),
                   Text(
                     appName,
-                    style: TextStyle(
+                    style: TextTheme.of(context).labelLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: 16,
                     ),
                   ),
                 ],
