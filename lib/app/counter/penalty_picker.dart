@@ -10,13 +10,13 @@ class PenaltyPickerDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Select a Penalty for ${athlete.name}'),
+      title: Text('Select a penalty for ${athlete.name}'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children:
             PenaltyType.values.map((penalty) {
               return ListTile(
-                title: Text("${penalty.label} (-${penalty.value})"),
+                title: Text(penalty.asString),
                 onTap: () => Navigator.pop(context, penalty),
               );
             }).toList(),

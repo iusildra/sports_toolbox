@@ -8,17 +8,26 @@ class Athlete {
   final CounterSettings setup;
   final String name;
 
-  int score = 0;
+  int _score = 0;
   List<PenaltyType> penalties = List.empty(growable: true);
 
-  void increment({int inc = 1}) => score += inc;
+  void increment({int inc = 1}) => _score += inc;
 
-  void decrement({int dec = 1}) => score -= dec;
+  void decrement({int dec = 1}) => _score -= dec;
 
   void addPenalty(PenaltyType penalty) => penalties.add(penalty);
 
-  get scoreWithoutPenalties =>
-      penalties.fold(score, (initialScore, penalty) => initialScore - penalty.value);
+  void reset() {
+    _score = 0;
+    penalties.clear();
+  }
+
+  get score => _score;
+
+  get scoreWithPenalties => penalties.fold(
+    _score,
+    (initialScore, penalty) => initialScore - penalty.value,
+  );
 }
 
 class CounterSettings {

@@ -7,16 +7,6 @@ class CounterSetup extends StatefulWidget {
 
   final Iterable<Color> availableColors;
 
-  List<DropdownMenuItem<Color>> colorChoiceWidgets() =>
-      availableColors
-          .map(
-            (color) => DropdownMenuItem(
-              value: color,
-              child: Container(width: 100, height: 20, color: color),
-            ),
-          )
-          .toList();
-
   const CounterSetup({
     super.key,
     required this.athlete,
@@ -53,6 +43,16 @@ class _CounterSetupState extends State<CounterSetup> {
     }
   }
 
+  List<DropdownMenuItem<Color>> colorChoiceWidgets() =>
+      widget.availableColors
+          .map(
+            (color) => DropdownMenuItem(
+              value: color,
+              child: Container(width: 100, height: 20, color: color),
+            ),
+          )
+          .toList();
+
   @override
   Widget build(BuildContext context) => Dialog(
     child: Container(
@@ -65,38 +65,7 @@ class _CounterSetupState extends State<CounterSetup> {
           Text('Counter Setup', style: TextTheme.of(context).headlineLarge),
           const SizedBox(height: 20),
           CustomDividers.simple(context),
-          Expanded(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: 'Athlete Name',
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a name';
-                      }
-                      return null;
-                    },
-                    initialValue: _name,
-                    onChanged: (value) => setState(() => _name = value),
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButtonHideUnderline(
-                    child: DropdownButton<Color>(
-                      value: _color,
-                      items: widget.colorChoiceWidgets(),
-                      onChanged: (value) => setState(() => _color = value!),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          Expanded(child: form()),
           CustomDividers.simple(context),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -108,11 +77,42 @@ class _CounterSetupState extends State<CounterSetup> {
                 ),
                 child: const Text('Cancel'),
               ),
-              FilledButton(onPressed: onSubmit, child: const Text('Save')),
+              FilledButton(key: Key("submit-setup"), onPressed: onSubmit, child: const Text('Save')),
             ],
           ),
         ],
       ),
+    ),
+  );
+
+  Form form() => Form(
+    key: _formKey,
+    child: Column(
+      children: [
+        TextFormField(
+          autofocus: true,
+          key: const Key('athlete-name-input'),
+          decoration: InputDecoration(
+            labelText: 'Athlete Name',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Name cannot be empty';
+            }
+            return null;
+          },
+          initialValue: _name,
+          onChanged: (value) => setState(() => _name = value),
+        ),
+        const SizedBox(height: 20),
+        DropdownButton<Color>(
+          key: const Key('color-dropdown'),
+          value: _color,
+          items: colorChoiceWidgets(),
+          onChanged: (value) => setState(() => _color = value!),
+        ),
+      ],
     ),
   );
 }

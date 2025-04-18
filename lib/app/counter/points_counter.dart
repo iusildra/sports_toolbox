@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:sports_toolbox/app/counter/athlete.dart';
 import 'package:sports_toolbox/app/counter/counter_setup.dart';
 import 'package:sports_toolbox/app/counter/penalty.dart';
-import 'package:sports_toolbox/app/counter/penalty_picket.dart';
+import 'package:sports_toolbox/app/counter/penalty_picker.dart';
 import 'package:sports_toolbox/app/decorations.dart';
 import 'package:sports_toolbox/components/dialogs.dart';
 
 class PointsCounterPage extends StatefulWidget {
   const PointsCounterPage({super.key});
+
+  static Key columnKey(int index) => Key("athlete-$index-column");
+  static Key scoreBoxKey(int index) => Key("athlete-$index-score-box");
+  static Key scoreDisplayKey(int index) => Key("athlete-$index-score-display");
 
   @override
   State<StatefulWidget> createState() => _PointsCounterState();
@@ -16,7 +20,7 @@ class PointsCounterPage extends StatefulWidget {
 class _PointsCounterState extends State<PointsCounterPage> {
   static const String appName = 'Points Counter';
 
-  static List<Color> availableColors = [
+  static final List<Color> availableColors = [
     Colors.blue.shade200,
     Colors.red.shade200,
     Colors.green.shade200,
@@ -24,7 +28,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
     Colors.purple.shade200,
   ];
 
-  Map<int, Athlete> athleteScores = {
+  final Map<int, Athlete> athleteScores = {
     0: Athlete(
       key: 0,
       name: 'Athlete 1',
@@ -46,7 +50,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
 
   void updateAthleteSetup(Athlete athlete) {
     setState(() => athleteScores[athlete.key] = athlete);
-    resetScore();
+    resetScores();
   }
 
   void showAthleteSetupDialog(Athlete athlete) async {
@@ -76,12 +80,8 @@ class _PointsCounterState extends State<PointsCounterPage> {
   void incrementScore(int index) =>
       setState(() => athleteScores[index]?.increment());
 
-  void resetScore() => setState(() {
-    for (var a in athleteScores.values) {
-      a.score = 0;
-      a.penalties.clear();
-    }
-  });
+  void resetScores() =>
+      setState(() => athleteScores.values.forEach((a) => a.reset()));
 
   @override
   Widget build(BuildContext context) {
@@ -104,12 +104,16 @@ class _PointsCounterState extends State<PointsCounterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FilledButton.tonalIcon(
+                  key: const Key("reset-button"),
                   onPressed:
                       () => showDialog(
                         context: context,
                         builder:
-                            (context) =>
-                                CustomDialogs.confirmReset(context, resetScore),
+                            (context) => CustomDialogs.confirmReset(
+                              context,
+                              const Key("confirm-reset"),
+                              resetScores,
+                            ),
                       ),
                   icon: const Icon(Icons.refresh),
                   label: const Text('Reset'),
@@ -127,6 +131,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
       IconButton(
         icon: const Icon(Icons.remove_circle_outline),
         onPressed: () => showPenaltyPickerDialog(athlete),
+        tooltip: "Add penalty",
       ),
       Text(
         athlete.name,
@@ -140,6 +145,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
       ),
     ];
     return Expanded(
+      key: PointsCounterPage.columnKey(athlete.key),
       child: Container(
         color: athlete.setup.color,
         padding: EdgeInsets.all(16),
@@ -151,6 +157,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
             ),
             Expanded(
               child: GestureDetector(
+                key: PointsCounterPage.scoreBoxKey(athlete.key),
                 onTap: () => incrementScore(athlete.key),
                 child: Container(
                   decoration: Borders.surrounding(context),
@@ -165,13 +172,14 @@ class _PointsCounterState extends State<PointsCounterPage> {
   }
 
   Widget scoreDisplay(BuildContext context, Athlete athlete) => Column(
+    key: PointsCounterPage.scoreDisplayKey(athlete.key),
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            athlete.scoreWithoutPenalties.toString(),
+            athlete.scoreWithPenalties.toString(),
             style: TextTheme.of(context).displayLarge,
           ),
           athlete.penalties.isNotEmpty

@@ -14,3 +14,9 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Analysis options setup
+
+### avoid_function_literals_in_foreach_calls
+
+Removed the warning about it as for unit-returning functions, the `forEach` makes sense to use (Always use the less powerful tool)
