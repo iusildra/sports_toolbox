@@ -3,6 +3,7 @@ import 'package:sports_toolbox/app/counter/athlete.dart';
 import 'package:sports_toolbox/app/counter/counter_setup.dart';
 import 'package:sports_toolbox/app/counter/penalty.dart';
 import 'package:sports_toolbox/app/counter/penalty_picket.dart';
+import 'package:sports_toolbox/app/decorations.dart';
 import 'package:sports_toolbox/components/dialogs.dart';
 
 class PointsCounterPage extends StatefulWidget {
@@ -152,41 +153,8 @@ class _PointsCounterState extends State<PointsCounterPage> {
               child: GestureDetector(
                 onTap: () => incrementScore(athlete.key),
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      style: BorderStyle.solid,
-                      width: 2,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              athlete.scoreWithoutPenalties.toString(),
-                              style: TextTheme.of(context).displayLarge,
-                            ),
-                            athlete.penalties.isNotEmpty
-                                ? Text(
-                                  "(${athlete.score.toString()})",
-                                  style: TextTheme.of(context).titleLarge,
-                                )
-                                : const SizedBox(),
-                          ],
-                        ),
-                        Wrap(
-                          alignment: WrapAlignment.start,
-                          spacing: 8,
-                          runSpacing: 8,
-                          children:
-                              athlete.penalties.map((p) => p.asIcons).toList(),
-                        ),
-                      ],
-                    ),
-                  ),
+                  decoration: Borders.surrounding(context),
+                  child: scoreDisplay(context, athlete),
                 ),
               ),
             ),
@@ -195,4 +163,31 @@ class _PointsCounterState extends State<PointsCounterPage> {
       ),
     );
   }
+
+  Widget scoreDisplay(BuildContext context, Athlete athlete) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            athlete.scoreWithoutPenalties.toString(),
+            style: TextTheme.of(context).displayLarge,
+          ),
+          athlete.penalties.isNotEmpty
+              ? Text(
+                "(${athlete.score.toString()})",
+                style: TextTheme.of(context).titleLarge,
+              )
+              : const SizedBox(),
+        ],
+      ),
+      Wrap(
+        alignment: WrapAlignment.start,
+        spacing: 8,
+        runSpacing: 8,
+        children: athlete.penalties.map((p) => p.asIcons).toList(),
+      ),
+    ],
+  );
 }
