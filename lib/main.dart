@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_toolbox/app/counter/points_counter.dart';
 import 'package:sports_toolbox/app/grid_tile.dart';
+import 'package:sports_toolbox/app/settings/settings_form.dart';
 import 'package:sports_toolbox/app/time/stopwatch.dart';
 import 'package:sports_toolbox/app/time/timer.dart';
-import 'package:sports_toolbox/models/theme_model.dart';
+import 'package:sports_toolbox/models/settings_model.dart';
 
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ThemeModel(),
+      create: (context) => SettingsModel(),
       child: const MyApp(),
     ),
   );
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeModel>(
+    return Consumer<SettingsModel>(
       builder: (context, theme, child) {
         return MaterialApp(
           title: 'Sports toolbox',
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
   static const _apps = [
     ('Stopwatch', Icons.access_alarm, StopwatchPage()),
     ('Timer', Icons.timer, TimerPage()),
-    ('Score counter', Icons.sports_score, PointsCounterPage())
+    ('Score counter', Icons.sports_score, PointsCounterPage()),
   ];
 
   @override
@@ -57,8 +58,8 @@ class HomePage extends StatelessWidget {
             title: Text(title),
             actions: [
               IconButton(
-                icon: const Icon(Icons.color_lens),
-                onPressed: () => context.read<ThemeModel>().switchColor(),
+                icon: const Icon(Icons.settings),
+                onPressed: () => SettingsForm.openSettingsForm(context),
               ),
             ],
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,

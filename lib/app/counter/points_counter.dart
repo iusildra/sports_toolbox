@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_toolbox/app/counter/athlete.dart';
 import 'package:sports_toolbox/app/counter/counter_setup.dart';
 import 'package:sports_toolbox/app/counter/penalty.dart';
@@ -6,6 +7,7 @@ import 'package:sports_toolbox/app/counter/penalty_picker.dart';
 import 'package:sports_toolbox/app/decorations.dart';
 import 'package:sports_toolbox/components/dialogs.dart';
 import 'package:flutter/services.dart';
+import 'package:sports_toolbox/models/settings_model.dart';
 
 class PointsCounterPage extends StatefulWidget {
   const PointsCounterPage({super.key});
@@ -43,8 +45,10 @@ class _PointsCounterState extends State<PointsCounterPage> {
     setState(() => athletes[athlete.key]?.addPenalty(penalty));
   }
 
-  void incrementScore(int index) =>
-      setState(() => athletes[index]?.increment());
+  void incrementScore(int index) {
+    setState(() => athletes[index]?.increment());
+    Provider.of<SettingsModel>(context, listen: false).performVibrate();
+  }
 
   void resetScores() =>
       setState(() => athletes.values.forEach((a) => a.reset()));
