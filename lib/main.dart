@@ -23,16 +23,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsModel>(
-      builder: (context, theme, child) {
-        return MaterialApp(
-          title: 'Sports toolbox',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: theme.color),
+      builder:
+          (context, theme, child) => MaterialApp(
+            title: 'Sports toolbox',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: theme.color),
+            ),
+            home: const HomePage(title: 'Sports Toolbox'),
           ),
-          home: const HomePage(title: 'Sports Toolbox'),
-        );
-      },
     );
   }
 }

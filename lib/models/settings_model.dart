@@ -5,6 +5,10 @@ class SettingsModel extends ChangeNotifier {
   Color _color = Colors.blue;
   VibrationModel? _vibrationModel;
 
+  SettingsModel({Color? color, VibrationModel? vibrationModel})
+      : _color = color ?? Colors.blue,
+        _vibrationModel = vibrationModel;
+
   Color get color => _color;
   VibrationModel? get vibrationModel => _vibrationModel;
 

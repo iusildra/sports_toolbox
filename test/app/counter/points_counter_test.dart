@@ -9,9 +9,16 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
+import 'package:provider/provider.dart';
 import 'package:sports_toolbox/app/counter/penalty.dart';
 import 'package:sports_toolbox/app/counter/points_counter.dart';
+import 'package:sports_toolbox/models/settings_model.dart';
 
+import 'points_counter_test.mocks.dart';
+
+@GenerateMocks([VibrationModel])
 void main() {
   Future<void> incrementZone(
     WidgetTester tester,
@@ -171,4 +178,44 @@ void main() {
     // Verify that the scores have been reset to 0
     expect(find.text("0"), findsNWidgets(2));
   });
+
+  /* -------------------------------------------------------------------------- */
+  /*                                 Vibrations                                 */
+  /* -------------------------------------------------------------------------- */
+  testWidgets(
+    'Vibrate when adding a point if vibration is enabled, otherwise do nothing',
+    (WidgetTester tester) async {
+      // Mock the Vibration class
+
+      final mockVibration = MockVibrationModel();
+      final settings = SettingsModel(vibrationModel: null);
+
+      // Provide the mock Vibration instance to the widget tree
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Consumer<SettingsModel>(
+            builder: (context, theme, child) => PointsCounterPage(),
+          ),
+          // Provide the mock Vibration instance to the widget tree
+          builder: (context, child) {
+            return ChangeNotifierProvider(
+              create: (_) => settings,
+              child: child!,
+            );
+          },
+        ),
+      );
+
+      // Simulate a tap on the increment zone
+      await incrementZone(tester, 0);
+      await tester.pumpAndSettle();
+      verifyNever(mockVibration.doVibrate());
+
+      settings.update(vibrationModel: mockVibration);
+
+      await incrementZone(tester, 0);
+      await tester.pumpAndSettle();
+      verify(mockVibration.doVibrate()).called(1);
+    },
+  );
 }
