@@ -5,6 +5,7 @@ import 'package:sports_toolbox/app/counter/penalty.dart';
 import 'package:sports_toolbox/app/counter/penalty_picker.dart';
 import 'package:sports_toolbox/app/decorations.dart';
 import 'package:sports_toolbox/components/dialogs.dart';
+import 'package:flutter/services.dart';
 
 class PointsCounterPage extends StatefulWidget {
   const PointsCounterPage({super.key});
@@ -84,7 +85,23 @@ class _PointsCounterState extends State<PointsCounterPage> {
       setState(() => athleteScores.values.forEach((a) => a.reset()));
 
   @override
+  void dispose() {
+    // Reset to Default Orientation
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     return Scaffold(
       appBar: AppBar(title: const Text(appName)),
       body: Stack(
