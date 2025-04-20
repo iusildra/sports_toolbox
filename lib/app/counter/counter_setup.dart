@@ -5,12 +5,44 @@ import 'package:sports_toolbox/components/divider.dart';
 class CounterSetup extends StatefulWidget {
   final Athlete athlete;
 
-  final Iterable<Color> availableColors;
+  final Iterable<Color> usedColors;
+
+  static final List<Color> availableColors = [
+    Colors.blue.shade200,
+    Colors.red.shade200,
+    Colors.green.shade200,
+    Colors.yellow.shade200,
+    Colors.purple.shade200,
+  ];
+
+  Iterable<Color> _availableColorForAthlete(Athlete athlete) =>
+      availableColors.where(
+        (color) => usedColors.every((a) => a == athlete.color || a != color),
+      );
+
+  static void showAthleteSetupDialog(
+    BuildContext context,
+    Athlete athlete,
+    Iterable<Athlete> athletes,
+    Function(Athlete) onComplete,
+  ) async {
+    final newAthletes = await showDialog<Athlete>(
+      context: context,
+      builder:
+          (context) => CounterSetup(
+            athlete: athlete,
+            usedColors: athletes.map((a) => a.color),
+          ),
+    );
+    if (newAthletes != null) {
+      onComplete(newAthletes);
+    }
+  }
 
   const CounterSetup({
     super.key,
     required this.athlete,
-    required this.availableColors,
+    required this.usedColors,
   });
 
   @override
@@ -24,7 +56,7 @@ class _CounterSetupState extends State<CounterSetup> {
   @override
   void initState() {
     super.initState();
-    _color = widget.athlete.setup.color;
+    _color = widget.athlete.color;
     _name = widget.athlete.name;
   }
 
@@ -34,17 +66,14 @@ class _CounterSetupState extends State<CounterSetup> {
     if (_formKey.currentState!.validate()) {
       Navigator.pop(
         context,
-        Athlete(
-          key: widget.athlete.key,
-          name: _name,
-          setup: CounterSettings(color: _color),
-        ),
+        Athlete(key: widget.athlete.key, name: _name, color: _color),
       );
     }
   }
 
   List<DropdownMenuItem<Color>> colorChoiceWidgets() =>
-      widget.availableColors
+      widget
+          ._availableColorForAthlete(widget.athlete)
           .map(
             (color) => DropdownMenuItem(
               value: color,
@@ -77,7 +106,11 @@ class _CounterSetupState extends State<CounterSetup> {
                 ),
                 child: const Text('Cancel'),
               ),
-              FilledButton(key: Key("submit-setup"), onPressed: onSubmit, child: const Text('Save')),
+              FilledButton(
+                key: Key("submit-setup"),
+                onPressed: onSubmit,
+                child: const Text('Save'),
+              ),
             ],
           ),
         ],

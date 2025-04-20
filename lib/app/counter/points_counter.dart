@@ -21,68 +21,33 @@ class PointsCounterPage extends StatefulWidget {
 class _PointsCounterState extends State<PointsCounterPage> {
   static const String appName = 'Points Counter';
 
-  static final List<Color> availableColors = [
-    Colors.blue.shade200,
-    Colors.red.shade200,
-    Colors.green.shade200,
-    Colors.yellow.shade200,
-    Colors.purple.shade200,
-  ];
-
-  final Map<int, Athlete> athleteScores = {
+  final Map<int, Athlete> athletes = {
     0: Athlete(
       key: 0,
       name: 'Athlete 1',
-      setup: CounterSettings(color: availableColors[0]),
+      color: CounterSetup.availableColors[0],
     ),
     1: Athlete(
       key: 1,
       name: 'Athlete 2',
-      setup: CounterSettings(color: availableColors[1]),
+      color: CounterSetup.availableColors[1],
     ),
   };
 
-  Iterable<Color> _availableColorForAthlete(Athlete athlete) =>
-      availableColors.where(
-        (color) => athleteScores.values.every(
-          (a) => a == athlete || a.setup.color != color,
-        ),
-      );
-
   void updateAthleteSetup(Athlete athlete) {
-    setState(() => athleteScores[athlete.key] = athlete);
+    setState(() => athletes[athlete.key] = athlete);
     resetScores();
   }
 
-  void showAthleteSetupDialog(Athlete athlete) async {
-    final newAthletes = await showDialog<Athlete>(
-      context: context,
-      builder:
-          (context) => CounterSetup(
-            athlete: athlete,
-            availableColors: _availableColorForAthlete(athlete),
-          ),
-    );
-    if (newAthletes != null) {
-      updateAthleteSetup(newAthletes);
-    }
-  }
-
-  void showPenaltyPickerDialog(Athlete athlete) async {
-    final penalty = await showDialog<PenaltyType>(
-      context: context,
-      builder: (context) => PenaltyPickerDialog(athlete: athlete),
-    );
-    if (penalty != null) {
-      setState(() => athlete.addPenalty(penalty));
-    }
+  void addPenalty(Athlete athlete, PenaltyType penalty) {
+    setState(() => athletes[athlete.key]?.addPenalty(penalty));
   }
 
   void incrementScore(int index) =>
-      setState(() => athleteScores[index]?.increment());
+      setState(() => athletes[index]?.increment());
 
   void resetScores() =>
-      setState(() => athleteScores.values.forEach((a) => a.reset()));
+      setState(() => athletes.values.forEach((a) => a.reset()));
 
   @override
   void dispose() {
@@ -109,7 +74,7 @@ class _PointsCounterState extends State<PointsCounterPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children:
-                athleteScores
+                athletes
                     .map(
                       (i, v) => MapEntry(i, athleteScoreColumn(v, i % 2 != 0)),
                     )
@@ -150,7 +115,12 @@ class _PointsCounterState extends State<PointsCounterPage> {
     List<Widget> header = [
       IconButton(
         icon: const Icon(Icons.remove_circle_outline),
-        onPressed: () => showPenaltyPickerDialog(athlete),
+        onPressed:
+            () => PenaltyPickerDialog.showPenaltyPickerDialog(
+              context,
+              athlete,
+              addPenalty,
+            ),
         tooltip: "Add penalty",
       ),
       Text(
@@ -161,13 +131,19 @@ class _PointsCounterState extends State<PointsCounterPage> {
       ),
       IconButton(
         icon: const Icon(Icons.settings),
-        onPressed: () => showAthleteSetupDialog(athlete),
+        onPressed:
+            () => CounterSetup.showAthleteSetupDialog(
+              context,
+              athlete,
+              athletes.values,
+              updateAthleteSetup,
+            ),
       ),
     ];
     return Expanded(
       key: PointsCounterPage.columnKey(athlete.key),
       child: Container(
-        color: athlete.setup.color,
+        color: athlete.color,
         padding: EdgeInsets.all(16),
         child: Column(
           children: [

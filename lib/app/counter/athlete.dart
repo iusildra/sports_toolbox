@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sports_toolbox/app/counter/penalty.dart';
 
 class Athlete {
-  Athlete({required this.key, required this.name, required this.setup});
+  Athlete({required this.key, required this.name, required this.color});
 
   final int key;
-  final CounterSettings setup;
+  final Color color;
   final String name;
 
   int _score = 0;
@@ -28,10 +28,4 @@ class Athlete {
     _score,
     (initialScore, penalty) => initialScore - penalty.value,
   );
-}
-
-class CounterSettings {
-  CounterSettings({required this.color});
-
-  final Color color;
 }

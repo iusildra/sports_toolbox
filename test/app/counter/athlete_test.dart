@@ -8,11 +8,7 @@ void main() {
     'Adding a penalty to an athlete does not affect its score, but the score with penalties is updated',
     () {
       // Arrange
-      final athlete = Athlete(
-        key: 1,
-        name: 'John Doe',
-        setup: CounterSettings(color: Colors.blue),
-      );
+      final athlete = Athlete(key: 1, name: 'John Doe', color: Colors.blue);
       final penalty = PenaltyType.warning;
 
       // Act

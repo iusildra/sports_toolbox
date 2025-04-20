@@ -12,18 +12,10 @@ import 'package:sports_toolbox/app/counter/athlete.dart';
 import 'package:sports_toolbox/app/counter/counter_setup.dart';
 
 void main() {
-  final List<Color> availableColors = [
-    Colors.blue.shade200,
-    Colors.red.shade200,
-    Colors.green.shade200,
-    Colors.yellow.shade200,
-    Colors.purple.shade200,
-  ];
-
   final athlete = Athlete(
     key: 0,
     name: 'Athlete 1',
-    setup: CounterSettings(color: availableColors[0]),
+    color: CounterSetup.availableColors[0],
   );
 
   testWidgets(
@@ -32,24 +24,23 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CounterSetup(
-              athlete: athlete,
-              availableColors: availableColors,
-            ),
+            body: CounterSetup(athlete: athlete, usedColors: [athlete.color]),
           ),
         ),
       );
 
       final dialog = find.byType(Dialog);
-      final nameField =
-          tester.widget<TextFormField>(find.byKey(const Key('athlete-name-input')));
-      final colorDropdown =
-          tester.widget<DropdownButton<Color>>(find.byKey(const Key('color-dropdown')));
+      final nameField = tester.widget<TextFormField>(
+        find.byKey(const Key('athlete-name-input')),
+      );
+      final colorDropdown = tester.widget<DropdownButton<Color>>(
+        find.byKey(const Key('color-dropdown')),
+      );
       // Verify that the name and color are pre-filled
 
       expect(dialog, findsOneWidget);
       expect(nameField.initialValue, athlete.name);
-      expect(colorDropdown.value, athlete.setup.color);
+      expect(colorDropdown.value, athlete.color);
     },
   );
 
@@ -59,10 +50,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: CounterSetup(
-              athlete: athlete,
-              availableColors: availableColors,
-            ),
+            body: CounterSetup(athlete: athlete, usedColors: [athlete.color]),
           ),
         ),
       );

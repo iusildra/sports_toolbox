@@ -7,6 +7,20 @@ class PenaltyPickerDialog extends StatelessWidget {
 
   final Athlete athlete;
 
+  static void showPenaltyPickerDialog(
+    BuildContext context,
+    Athlete athlete,
+    Function(Athlete, PenaltyType) onComplete,
+  ) async {
+    final penalty = await showDialog<PenaltyType>(
+      context: context,
+      builder: (context) => PenaltyPickerDialog(athlete: athlete),
+    );
+    if (penalty != null) {
+      onComplete(athlete, penalty);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
