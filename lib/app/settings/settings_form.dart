@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_toolbox/models/settings_model.dart';
+import 'package:vibration/vibration.dart';
 
 class SettingsForm extends StatefulWidget {
   const SettingsForm({super.key});
 
-  static void openSettingsForm(BuildContext context) {
+  static void openSettingsForm(
+    BuildContext context, {
+    bool allowVibration = false,
+  }) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder:
@@ -32,7 +36,8 @@ class SettingsForm extends StatefulWidget {
 }
 
 class _SettingsFormState extends State<SettingsForm> {
-  bool _allowVibration = false;
+  bool _deviceAllowVibration = false;
+  bool _useVibration = false;
   late Color _selectedColor;
   late int _vibrationDuration;
   late int _vibrationIntensity;
@@ -49,8 +54,12 @@ class _SettingsFormState extends State<SettingsForm> {
   void initState() {
     super.initState();
     _selectedColor = context.read<SettingsModel>().color;
-    _vibrationDuration = 100; // Default duration
-    _vibrationIntensity = 50; // Default intensity
+    _vibrationDuration = 100;
+    _vibrationIntensity = 50;
+
+    Vibration.hasVibrator().then(
+      (onValue) => setState(() => _deviceAllowVibration = onValue),
+    );
   }
 
   void _updateColor(Color color) {
@@ -59,7 +68,7 @@ class _SettingsFormState extends State<SettingsForm> {
   }
 
   void _toggleVibration(bool? value) {
-    setState(() => _allowVibration = value ?? false);
+    setState(() => _useVibration = value ?? false);
     Provider.of<SettingsModel>(context, listen: false).update(
       vibrationModel: VibrationModel(
         duration: _vibrationDuration,
@@ -113,73 +122,82 @@ class _SettingsFormState extends State<SettingsForm> {
                     ),
                   ],
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                _deviceAllowVibration
+                    ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Vibration Settings:', style: settingGroupTheme),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text("Enable vibration", style: settingLabelTheme),
-                        Switch.adaptive(
-                          value: _allowVibration,
-                          onChanged: _toggleVibration,
+                        Row(
+                          children: [
+                            Text(
+                              'Vibration Settings:',
+                              style: settingGroupTheme,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text("Enable vibration", style: settingLabelTheme),
+                            Switch.adaptive(
+                              value: _useVibration,
+                              onChanged: _toggleVibration,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Duration (ms): $_vibrationDuration',
+                              style: settingLabelTheme,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 200),
+                              child: Slider.adaptive(
+                                value: _vibrationDuration.toDouble(),
+                                min: 50,
+                                max: 500,
+                                divisions: 9,
+                                label: '$_vibrationDuration ms',
+                                onChanged:
+                                    _useVibration
+                                        ? (value) => setState(
+                                          () =>
+                                              _vibrationDuration =
+                                                  value.toInt(),
+                                        )
+                                        : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Intensity: $_vibrationIntensity',
+                              style: settingLabelTheme,
+                            ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(maxWidth: 200),
+                              child: Slider.adaptive(
+                                value: _vibrationIntensity.toDouble(),
+                                min: 10,
+                                max: 100,
+                                divisions: 9,
+                                label: '$_vibrationIntensity',
+                                onChanged:
+                                    _useVibration
+                                        ? (value) => setState(
+                                          () =>
+                                              _vibrationIntensity =
+                                                  value.toInt(),
+                                        )
+                                        : null,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Duration (ms): $_vibrationDuration',
-                          style: settingLabelTheme,
-                        ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 200),
-                          child: Slider.adaptive(
-                            value: _vibrationDuration.toDouble(),
-                            min: 50,
-                            max: 500,
-                            divisions: 9,
-                            label: '$_vibrationDuration ms',
-                            onChanged:
-                                _allowVibration
-                                    ? (value) => setState(
-                                      () => _vibrationDuration = value.toInt(),
-                                    )
-                                    : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Intensity: $_vibrationIntensity',
-                          style: settingLabelTheme,
-                        ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 200),
-                          child: Slider.adaptive(
-                            value: _vibrationIntensity.toDouble(),
-                            min: 10,
-                            max: 100,
-                            divisions: 9,
-                            label: '$_vibrationIntensity',
-                            onChanged:
-                                _allowVibration
-                                    ? (value) => setState(
-                                      () => _vibrationIntensity = value.toInt(),
-                                    )
-                                    : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    )
+                    : const SizedBox(height: 0),
               ],
             ),
             const Spacer(),
