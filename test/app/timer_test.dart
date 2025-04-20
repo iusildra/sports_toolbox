@@ -1,55 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sports_toolbox/app/time/Timer.dart';
+import 'package:sports_toolbox/app/time/timer.dart';
 
 void main() {
-  testWidgets('Timer starts, pauses, resets, and sets duration correctly', (WidgetTester tester) async {
-    // Build the TimerPage widget
+  final timeRegex = RegExp(r'^\d{2}:\d{2}:\d{2}$');
+  final durations = find.descendant(
+    of: find.byKey(Key("timers")),
+    matching: find.textContaining(timeRegex),
+  );
+
+  final addButton = find.widgetWithText(ElevatedButton, 'Add timer');
+  // final setButton = find.widgetWithText(ElevatedButton, 'Set timer');
+  final removeButton = find.widgetWithText(ElevatedButton, 'Remove timer');
+  final startButton = find.widgetWithText(ElevatedButton, 'Start');
+  final pauseButton = find.widgetWithText(ElevatedButton, 'Pause');
+  final resetButton = find.widgetWithText(ElevatedButton, 'Reset');
+
+  testWidgets('Initial setup with one timer and remove timer button disabled', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const MaterialApp(home: TimerPage()));
 
-    // Verify initial state
-    expect(find.text('00:01:00'), findsOneWidget);
-    expect(find.text('Start'), findsOneWidget);
-    expect(find.text('Pause'), findsNothing);
+    expect(startButton, findsOneWidget);
+    expect(durations, findsOne);
 
-    // Start the timer
-    await tester.tap(find.text('Start'));
-    await tester.pump();
+    expect(tester.widget<ElevatedButton>(removeButton).enabled, isFalse);
+  });
 
-    // Verify timer is running
-    expect(find.text('Pause'), findsOneWidget);
-    expect(find.text('Start'), findsNothing);
+  testWidgets(
+    'Adding a timer should add it to the UI list in a lighter color, and enable the remove button',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const MaterialApp(home: TimerPage()));
 
-    // Wait for some time and verify elapsed time
-    await tester.pump(const Duration(seconds: 2));
-    expect(find.text('00:58'), findsOneWidget);
+      expect(addButton, findsOneWidget);
 
-    // Pause the timer
-    await tester.tap(find.text('Pause'));
-    await tester.pump();
+      await tester.tap(addButton);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(TextButton, "Set"));
+      await tester.pumpAndSettle();
 
-    // Verify timer is paused
-    expect(find.text('Start'), findsOneWidget);
-    expect(find.text('Pause'), findsNothing);
+      expect(durations, findsNWidgets(2));
+      expect(removeButton, findsOneWidget);
+      expect(tester.widget<ElevatedButton>(removeButton).enabled, isTrue);
 
-    // Reset the timer
-    await tester.tap(find.text('Reset'));
-    await tester.pump();
+      final firstTimerColor = tester.widget<Text>(durations.first).style?.color;
+      final secondTimerColor = tester.widget<Text>(durations.last).style?.color;
+      expect(firstTimerColor, isNot(secondTimerColor));
+    },
+  );
 
-    // Verify timer is reset
-    expect(find.text('00:01:00'), findsOneWidget);
+  testWidgets('Starting/pausing the timer switch the "Pause"/"Start"', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: TimerPage()));
 
-    // Set a new duration
-    await tester.tap(find.text('Set Timer'));
+    await tester.tap(startButton);
     await tester.pumpAndSettle();
 
-    // Select new duration in the dialog
-    await tester.tap(find.text('02 min').first); // Select 2 minutes
-    await tester.tap(find.text('30 sec').first); // Select 30 seconds
-    await tester.tap(find.text('Set'));
-    await tester.pump();
+    expect(startButton, findsNothing);
+    expect(pauseButton, findsOneWidget);
 
-    // Verify new duration is set
-    expect(find.text('02:30'), findsOneWidget);
+    await tester.tap(pauseButton);
+    await tester.pumpAndSettle();
+
+    expect(startButton, findsOneWidget);
+    expect(pauseButton, findsNothing);
   });
+
+  testWidgets('Pausing the timer cause the time to stop', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MaterialApp(home: TimerPage()));
+
+    await tester.tap(startButton);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
+    await tester.tap(pauseButton);
+
+    final startingValue = tester.widget<Text>(durations.first).data;
+    expect(startingValue, startsWith("00:00:5"));
+
+    await tester.pump(const Duration(seconds: 2));
+    expect(tester.widget<Text>(durations.first).data, startingValue);
+  });
+
+  testWidgets(
+    'Resetting the timer cause the timer to go back to its initial duration',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const MaterialApp(home: TimerPage()));
+
+      await tester.tap(startButton);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 2));
+      await tester.tap(pauseButton);
+
+      await tester.tap(resetButton);
+      await tester.pumpAndSettle();
+
+      final timerValue = tester.widget<Text>(durations.first).data;
+      expect(timerValue, "00:01:00");
+    },
+  );
 }

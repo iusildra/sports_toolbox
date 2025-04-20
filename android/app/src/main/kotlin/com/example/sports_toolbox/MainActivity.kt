@@ -1,4 +1,4 @@
-package com.example.sports_toolbox
+package dev.iusildra.sports_toolbox
 
 import io.flutter.embedding.android.FlutterActivity
 

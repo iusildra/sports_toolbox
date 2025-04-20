@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 class CustomDialogs {
-  static AlertDialog confirmReset(
+  static AlertDialog confirmAction(
     BuildContext context,
     Key key,
     VoidCallback onReset,
+    {required String title, required String content, required String action}
   ) => AlertDialog(
     key: key,
-    title: const Text('Please confirm reset'),
-    content: const Text('Are you sure you want to reset?'),
+    title: Text(title),
+    content: Text(content),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
@@ -20,7 +21,7 @@ class CustomDialogs {
           Navigator.pop(context);
         },
         child: Text(
-          'Reset',
+          action,
           style: TextStyle(color: Theme.of(context).colorScheme.error),
         ),
       ),

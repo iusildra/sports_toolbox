@@ -42,16 +42,14 @@ void main() {
 
       final dialog = find.byType(Dialog);
       final nameField =
-          find.byKey(const Key('athlete-name-input')).evaluate().first.widget
-              as TextFormField;
+          tester.widget<TextFormField>(find.byKey(const Key('athlete-name-input')));
       final colorDropdown =
-          find.byKey(const Key('color-dropdown')).evaluate().first.widget
-              as DropdownButtonFormField<Color>;
+          tester.widget<DropdownButton<Color>>(find.byKey(const Key('color-dropdown')));
       // Verify that the name and color are pre-filled
 
       expect(dialog, findsOneWidget);
       expect(nameField.initialValue, athlete.name);
-      expect(colorDropdown.initialValue, athlete.setup.color);
+      expect(colorDropdown.value, athlete.setup.color);
     },
   );
 

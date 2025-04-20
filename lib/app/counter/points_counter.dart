@@ -109,10 +109,13 @@ class _PointsCounterState extends State<PointsCounterPage> {
                       () => showDialog(
                         context: context,
                         builder:
-                            (context) => CustomDialogs.confirmReset(
+                            (context) => CustomDialogs.confirmAction(
                               context,
                               const Key("confirm-reset"),
                               resetScores,
+                              title: 'Please confirm reset',
+                              content: 'Are you sure you want to reset?',
+                              action: 'Reset',
                             ),
                       ),
                   icon: const Icon(Icons.refresh),

@@ -22,52 +22,47 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
     _seconds = widget.initialDuration.inSeconds % 60 % 60;
   }
 
+  DropdownButton<int> _buildDropdownButton({
+    required int inputValue,
+    required int itemCount,
+    required String suffix,
+    required ValueChanged<int?> onChanged,
+  }) {
+    return DropdownButton<int>(
+      value: inputValue,
+      items: List.generate(
+        itemCount,
+        (index) =>
+            DropdownMenuItem(value: index, child: Text('$index $suffix')),
+      ),
+      onChanged: onChanged,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Set Timer Duration'),
+      title: const Text('Set timer duration'),
       content: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 16,
         children: [
-          DropdownButton<int>(
-            value: _hours,
-            items:
-                List.generate(24, (index) => index)
-                    .map(
-                      (value) => DropdownMenuItem(
-                        value: value,
-                        child: Text('$value h'),
-                      ),
-                    )
-                    .toList(),
+          _buildDropdownButton(
+            inputValue: _hours,
+            itemCount: 24,
+            suffix: 'h',
             onChanged: (value) => setState(() => _hours = value!),
           ),
-          const SizedBox(width: 10),
-          DropdownButton<int>(
-            value: _minutes,
-            items:
-                List.generate(60, (index) => index)
-                    .map(
-                      (value) => DropdownMenuItem(
-                        value: value,
-                        child: Text('$value min'),
-                      ),
-                    )
-                    .toList(),
+          _buildDropdownButton(
+            inputValue: _minutes,
+            itemCount: 60,
+            suffix: 'min',
             onChanged: (value) => setState(() => _minutes = value!),
           ),
-          const SizedBox(width: 10),
-          DropdownButton<int>(
-            value: _seconds,
-            items:
-                List.generate(60, (index) => index)
-                    .map(
-                      (value) => DropdownMenuItem(
-                        value: value,
-                        child: Text('$value sec'),
-                      ),
-                    )
-                    .toList(),
+          _buildDropdownButton(
+            inputValue: _seconds,
+            itemCount: 60,
+            suffix: 'sec',
             onChanged: (value) => setState(() => _seconds = value!),
           ),
         ],
