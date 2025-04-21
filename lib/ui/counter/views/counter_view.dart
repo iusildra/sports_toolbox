@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:sports_toolbox/ui/counter/counter_setup.dart';
 import 'package:sports_toolbox/ui/counter/views/penalty_picker.dart';
 import 'package:sports_toolbox/components/decorations.dart';
@@ -19,86 +18,63 @@ class CounterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => CounterViewModel(CounterModel()),
-      child: Scaffold(
-        appBar: AppBar(title: const Text(appName)),
-        body: CounterView(),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: const Text(appName)),
+      body: CounterView(viewModel: CounterViewModel(CounterModel())),
     );
   }
 }
 
 class CounterView extends StatelessWidget {
-  const CounterView({super.key});
+  const CounterView({super.key, required this.viewModel});
 
-  // @override
-  // void dispose() {
-  //   // Reset to Default Orientation
-  //   SystemChrome.setPreferredOrientations([
-  //     DeviceOrientation.portraitUp,
-  //     DeviceOrientation.portraitDown,
-  //     DeviceOrientation.landscapeLeft,
-  //     DeviceOrientation.landscapeRight,
-  //   ]);
-  //   super.dispose();
-  // }
+  final CounterViewModel viewModel;
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = context.watch<CounterViewModel>();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    return Stack(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:
-              viewModel.athletes
-                  .map(
-                    (i, v) => MapEntry(
-                      i,
-                      athleteScoreColumn(context, viewModel, v, i % 2 != 0),
-                    ),
-                  )
-                  .values
-                  .toList(),
-        ),
-        Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FilledButton.tonalIcon(
-                key: const Key("reset-button"),
-                onPressed:
-                    () => showDialog(
-                      context: context,
-                      builder:
-                          (context) => CustomDialogs.confirmAction(
-                            context,
-                            const Key("confirm-reset"),
-                            viewModel.resetScores,
-                            title: 'Please confirm reset',
-                            content: 'Are you sure you want to reset?',
-                            action: 'Reset',
-                          ),
-                    ),
-                icon: const Icon(Icons.refresh),
-                label: const Text('Reset'),
+  Widget build(BuildContext _) => ListenableBuilder(
+    listenable: viewModel,
+    builder:
+        (context, _) => Stack(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ...viewModel.athletes.values.map(
+                  (v) => athleteScoreColumn(context, v, v.key % 2 != 0),
+                ),
+              ],
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilledButton.tonalIcon(
+                    key: const Key("reset-button"),
+                    onPressed:
+                        () => showDialog(
+                          context: context,
+                          builder:
+                              (context) => CustomDialogs.confirmAction(
+                                context,
+                                const Key("confirm-reset"),
+                                viewModel.resetScores,
+                                title: 'Please confirm reset',
+                                content: 'Are you sure you want to reset?',
+                                action: 'Reset',
+                              ),
+                        ),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reset'),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
+  );
 
   Expanded athleteScoreColumn(
     BuildContext context,
-    CounterViewModel viewModel,
     Athlete athlete,
     bool reverse,
   ) {

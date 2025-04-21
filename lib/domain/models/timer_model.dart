@@ -26,7 +26,8 @@ class TimerModel extends ChangeNotifier {
         } else {
           _currentDurationIndex =
               (_currentDurationIndex + 1) % _durations.length;
-          _remainingTime = _durations[_currentDurationIndex];
+          _remainingTime =
+              _durations[_currentDurationIndex] - Duration(seconds: 1);
         }
         notifyListeners();
       });
@@ -50,7 +51,7 @@ class TimerModel extends ChangeNotifier {
     _durations.insert(_currentDurationIndex + 1, duration);
     notifyListeners();
   }
-  
+
   void setTimer(Duration duration) {
     _durations[_currentDurationIndex] = duration;
     _remainingTime = duration;
