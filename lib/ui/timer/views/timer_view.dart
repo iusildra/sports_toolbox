@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:sports_toolbox/ui/timer/views/duration_picker.dart';
 import 'package:sports_toolbox/domain/models/timer_model.dart';
@@ -11,7 +12,7 @@ class TimerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Timer')),
-      body: TimerView(viewModel: TimerViewModel(TimerModel())),
+      body: TimerView(viewModel: TimerViewModel(TimerModel(), AudioPlayer())),
     );
   }
 }
@@ -100,8 +101,9 @@ class TimerView extends StatelessWidget {
                               initialDuration: TimerModel.defaultDuration,
                             ),
                       );
-                      if (newDuration != null)
+                      if (newDuration != null) {
                         viewModel.addDuration(newDuration);
+                      }
                     },
                     child: const Text('Add timer'),
                   ),

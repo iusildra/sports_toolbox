@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class TimerModel extends ChangeNotifier {
   static const defaultDuration = Duration(minutes: 1);
@@ -16,22 +16,25 @@ class TimerModel extends ChangeNotifier {
   Duration get remainingTime => _remainingTime;
   bool get isRunning => _timer?.isActive ?? false;
 
-  void startPauseTimer() {
+  void startPauseTimer({AsyncCallback? onComplete}) {
     if (isRunning) {
       _timer?.cancel();
-    } else {
-      _timer = Timer.periodic(_oneSecond, (timer) {
-        if (_remainingTime.inSeconds > 0) {
-          _remainingTime -= _oneSecond;
-        } else {
-          _currentDurationIndex =
-              (_currentDurationIndex + 1) % _durations.length;
-          _remainingTime =
-              _durations[_currentDurationIndex] - Duration(seconds: 1);
-        }
-        notifyListeners();
-      });
+      notifyListeners();
+      return;
     }
+
+    _timer = Timer.periodic(_oneSecond, (timer) async {
+      if (_remainingTime.inSeconds > 0) {
+        _remainingTime -= _oneSecond;
+      } else {
+        await onComplete?.call();
+        _currentDurationIndex =
+            (_currentDurationIndex + 1) % _durations.length;
+        _remainingTime =
+            _durations[_currentDurationIndex] - Duration(seconds: 1);
+      }
+      notifyListeners();
+    });
     notifyListeners();
   }
 
