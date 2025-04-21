@@ -1,13 +1,16 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_toolbox/app/counter/points_counter.dart';
-import 'package:sports_toolbox/app/grid_tile.dart';
-import 'package:sports_toolbox/app/settings/settings_form.dart';
-import 'package:sports_toolbox/app/time/stopwatch.dart';
-import 'package:sports_toolbox/app/time/timer.dart';
+import 'package:sports_toolbox/components/grid_tile.dart';
+import 'package:sports_toolbox/ui/settings/settings_form.dart';
+import 'package:sports_toolbox/ui/stopwatch/stopwatch.dart';
+import 'package:sports_toolbox/ui/counter/views/counter_view.dart';
+import 'package:sports_toolbox/ui/timer/views/timer.dart';
 import 'package:sports_toolbox/models/settings_model.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Alarm.init();
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingsModel(),
@@ -44,7 +47,7 @@ class HomePage extends StatelessWidget {
   static const _apps = [
     ('Stopwatch', Icons.access_alarm, StopwatchPage()),
     ('Timer', Icons.timer, TimerPage()),
-    ('Score counter', Icons.sports_score, PointsCounterPage()),
+    ('Score counter', Icons.sports_score, CounterPage()),
   ];
 
   @override

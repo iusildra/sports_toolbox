@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sports_toolbox/app/counter/athlete.dart';
-import 'package:sports_toolbox/app/counter/penalty.dart';
+import 'package:sports_toolbox/data/models/athlete.dart';
+import 'package:sports_toolbox/data/models/penalty.dart';
 
 class PenaltyPickerDialog extends StatelessWidget {
   const PenaltyPickerDialog({super.key, required this.athlete});

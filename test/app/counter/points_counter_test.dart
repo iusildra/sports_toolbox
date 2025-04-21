@@ -12,9 +12,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
-import 'package:sports_toolbox/app/counter/penalty.dart';
-import 'package:sports_toolbox/app/counter/points_counter.dart';
+import 'package:sports_toolbox/data/models/penalty.dart';
 import 'package:sports_toolbox/models/settings_model.dart';
+import 'package:sports_toolbox/ui/counter/views/counter_view.dart';
 
 import 'points_counter_test.mocks.dart';
 
@@ -25,7 +25,7 @@ void main() {
     int index, {
     int increment = 1,
   }) async {
-    final incrementZone = find.byKey(PointsCounterPage.scoreBoxKey(index));
+    final incrementZone = find.byKey(CounterPage.scoreBoxKey(index));
     for (int i = 0; i < increment; i++) {
       await tester.tap(incrementZone);
     }
@@ -39,7 +39,7 @@ void main() {
     WidgetTester tester,
   ) async {
     // Build the CounterPage widget
-    await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
     final penaltyButton = Icons.remove_circle_outline;
     final setupButton = Icons.settings;
 
@@ -57,7 +57,7 @@ void main() {
   testWidgets('Clicking on each of the increment zone increment the score', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
 
     await incrementZone(tester, 0);
     await incrementZone(tester, 1);
@@ -75,7 +75,7 @@ void main() {
   /*                                  Penalties                                 */
   /* -------------------------------------------------------------------------- */
   testWidgets('Open the penalty selector', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
 
     // Ensure the dialog is not displayed
     expect(find.byType(AlertDialog), findsNothing);
@@ -83,7 +83,7 @@ void main() {
     // Simulate a tap on the penalty button
     await tester.tap(
       find.descendant(
-        of: find.byKey(PointsCounterPage.columnKey(0)),
+        of: find.byKey(CounterPage.columnKey(0)),
         matching: find.widgetWithIcon(IconButton, Icons.remove_circle_outline),
       ),
     );
@@ -97,9 +97,9 @@ void main() {
   testWidgets(
     'Adding a penalty removes points from score, show the total without penalties and add it\'s icon',
     (WidgetTester tester) async {
-      await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+      await tester.pumpWidget(const MaterialApp(home: CounterPage()));
 
-      final anyAthleteColumn = find.byKey(PointsCounterPage.columnKey(0));
+      final anyAthleteColumn = find.byKey(CounterPage.columnKey(0));
       // Simulate a tap on the penalty button
       await tester.tap(
         find.descendant(
@@ -143,7 +143,7 @@ void main() {
   testWidgets('Resetting the score prompt for confirmation', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
 
     // Ensure the dialog is not displayed
     expect(find.byType(AlertDialog), findsNothing);
@@ -159,7 +159,7 @@ void main() {
   testWidgets('Applying reset updates the scores to 0 for both athletes', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: PointsCounterPage()));
+    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
 
     // Simulate a match
     await incrementZone(tester, 0, increment: 2);
@@ -194,7 +194,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Consumer<SettingsModel>(
-            builder: (context, theme, child) => PointsCounterPage(),
+            builder: (context, theme, child) => CounterPage(),
           ),
           // Provide the mock Vibration instance to the widget tree
           builder: (context, child) {

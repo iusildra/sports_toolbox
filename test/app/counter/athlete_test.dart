@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sports_toolbox/app/counter/athlete.dart';
-import 'package:sports_toolbox/app/counter/penalty.dart';
+import 'package:sports_toolbox/data/models/athlete.dart';
+import 'package:sports_toolbox/data/models/penalty.dart';
 
 void main() {
   test(

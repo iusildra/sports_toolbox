@@ -8,8 +8,8 @@
 */
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sports_toolbox/app/counter/athlete.dart';
-import 'package:sports_toolbox/app/counter/counter_setup.dart';
+import 'package:sports_toolbox/data/models/athlete.dart';
+import 'package:sports_toolbox/ui/counter/counter_setup.dart';
 
 void main() {
   final athlete = Athlete(

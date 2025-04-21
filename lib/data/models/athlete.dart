@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sports_toolbox/app/counter/penalty.dart';
+import 'package:sports_toolbox/data/models/penalty.dart';
 
 class Athlete {
   Athlete({required this.key, required this.name, required this.color});

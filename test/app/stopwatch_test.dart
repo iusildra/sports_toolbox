@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sports_toolbox/app/time/stopwatch.dart';
+import 'package:sports_toolbox/ui/stopwatch/stopwatch.dart';
 
 void main() {
   final timeRegex = RegExp(r'^\d{2}:\d{2}\.\d{2}$');

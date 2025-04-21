@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sports_toolbox/app/counter/athlete.dart';
+import 'package:sports_toolbox/data/models/athlete.dart';
 import 'package:sports_toolbox/components/divider.dart';
 
 class CounterSetup extends StatefulWidget {
