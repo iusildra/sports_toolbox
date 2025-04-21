@@ -1,4 +1,3 @@
-import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_toolbox/components/grid_tile.dart';
@@ -10,7 +9,6 @@ import 'package:sports_toolbox/models/settings_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Alarm.init();
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingsModel(),
