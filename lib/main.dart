@@ -4,7 +4,7 @@ import 'package:sports_toolbox/components/grid_tile.dart';
 import 'package:sports_toolbox/ui/settings/settings_form.dart';
 import 'package:sports_toolbox/ui/stopwatch/stopwatch.dart';
 import 'package:sports_toolbox/ui/counter/views/counter_view.dart';
-import 'package:sports_toolbox/ui/timer/views/timer.dart';
+import 'package:sports_toolbox/ui/timer/views/timer_view.dart';
 import 'package:sports_toolbox/models/settings_model.dart';
 
 void main() async {
