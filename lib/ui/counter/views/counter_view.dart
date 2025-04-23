@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sports_toolbox/ui/counter/counter_setup.dart';
 import 'package:sports_toolbox/ui/counter/views/penalty_picker.dart';
 import 'package:sports_toolbox/components/decorations.dart';
