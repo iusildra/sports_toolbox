@@ -2,41 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 
 class SettingsModel extends ChangeNotifier {
-  Color _color = Colors.blue;
-  VibrationModel? _vibrationModel;
+  Color _color;
+  VibrationKind _vibrationModel;
 
-  SettingsModel({Color? color, VibrationModel? vibrationModel})
+  SettingsModel({Color? color, VibrationKind? vibration})
     : _color = color ?? Colors.blue,
-      _vibrationModel = vibrationModel;
+      _vibrationModel = vibration ?? NoVibration();
 
   Color get color => _color;
-  VibrationModel? get vibrationModel => _vibrationModel;
+  VibrationKind get vibration => _vibrationModel;
 
-  void performVibrate() {
-    vibrationModel?.doVibrate();
-  }
-
-  void update({Color? color, VibrationModel? vibrationModel}) {
-    if (color != null) {
-      _color = color;
-    }
-    if (vibrationModel != null) {
-      _vibrationModel = vibrationModel;
-    }
+  void update({Color? color, VibrationKind? vibrationModel}) {
+    if (color != null) _color = color;
+    if (vibrationModel != null) _vibrationModel = vibrationModel;
     notifyListeners();
   }
 }
 
-class VibrationModel {
-  final int _duration;
-  final int _intensity;
+sealed class VibrationKind {
+  const VibrationKind();
 
-  VibrationModel({int duration = 100, int intensity = 50})
-    : _duration = duration,
-      _intensity = intensity;
+  Future<bool> get hasVibrator => Vibration.hasVibrator();
 
-  void doVibrate() {
-    Vibration.hasVibrator();
-    Vibration.vibrate(duration: _duration, amplitude: _intensity);
-  }
+  Future<void> performVibrate() => switch (this) {
+    NoVibration() => Future.value(),
+    VibrationWithSettings(duration: final d, intensity: final i) =>
+      Vibration.vibrate(duration: d, amplitude: i),
+  };
+}
+
+class NoVibration extends VibrationKind {
+  const NoVibration();
+}
+
+class VibrationWithSettings extends VibrationKind {
+  final int duration;
+  final int intensity;
+
+  const VibrationWithSettings({this.duration = 100, this.intensity = 50});
 }

@@ -20,7 +20,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsModel>(
@@ -81,11 +80,6 @@ class HomePage extends StatelessWidget {
                     .toList(),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }

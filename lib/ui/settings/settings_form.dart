@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sports_toolbox/models/settings_model.dart';
-import 'package:vibration/vibration.dart';
 
 class SettingsForm extends StatefulWidget {
   const SettingsForm({super.key});
@@ -37,7 +36,7 @@ class SettingsForm extends StatefulWidget {
 
 class _SettingsFormState extends State<SettingsForm> {
   bool _deviceAllowVibration = false;
-  bool _useVibration = false;
+  late bool _useVibration;
   late Color _selectedColor;
   late int _vibrationDuration;
   late int _vibrationIntensity;
@@ -53,11 +52,25 @@ class _SettingsFormState extends State<SettingsForm> {
   @override
   void initState() {
     super.initState();
-    _selectedColor = context.read<SettingsModel>().color;
-    _vibrationDuration = 100;
-    _vibrationIntensity = 50;
+    final currentSettings = context.read<SettingsModel>();
+    _selectedColor = currentSettings.color;
+    switch (currentSettings.vibration) {
+      case VibrationWithSettings(
+        duration: final duration,
+        intensity: final intensity,
+      ):
+        _vibrationDuration = duration;
+        _vibrationIntensity = intensity;
+        _useVibration = true;
+        break;
+      case NoVibration():
+        _vibrationDuration = 50;
+        _vibrationIntensity = 10;
+        _useVibration = false;
+        break;
+    }
 
-    Vibration.hasVibrator().then(
+    currentSettings.vibration.hasVibrator.then(
       (onValue) => setState(() => _deviceAllowVibration = onValue),
     );
   }
@@ -70,10 +83,7 @@ class _SettingsFormState extends State<SettingsForm> {
   void _toggleVibration(bool? value) {
     setState(() => _useVibration = value ?? false);
     Provider.of<SettingsModel>(context, listen: false).update(
-      vibrationModel: VibrationModel(
-        duration: _vibrationDuration,
-        intensity: _vibrationIntensity,
-      ),
+      vibrationModel: _useVibration ? VibrationWithSettings() : NoVibration(),
     );
   }
 
@@ -90,6 +100,7 @@ class _SettingsFormState extends State<SettingsForm> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,10 +216,13 @@ class _SettingsFormState extends State<SettingsForm> {
               onPressed: () {
                 settings.update(
                   color: _selectedColor,
-                  vibrationModel: VibrationModel(
-                    duration: _vibrationDuration,
-                    intensity: _vibrationIntensity,
-                  ),
+                  vibrationModel:
+                      _useVibration
+                          ? VibrationWithSettings(
+                            duration: _vibrationDuration,
+                            intensity: _vibrationIntensity,
+                          )
+                          : NoVibration(),
                 );
                 Navigator.pop(context);
               },

@@ -18,7 +18,7 @@ import 'package:sports_toolbox/ui/counter/views/counter_view.dart';
 
 import 'points_counter_test.mocks.dart';
 
-@GenerateMocks([VibrationModel])
+@GenerateMocks([NoVibration, VibrationWithSettings])
 void main() {
   Future<void> incrementZone(
     WidgetTester tester,
@@ -57,7 +57,12 @@ void main() {
   testWidgets('Clicking on each of the increment zone increment the score', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => SettingsModel(),
+        child: const MaterialApp(home: CounterPage()),
+      ),
+    );
 
     await incrementZone(tester, 0);
     await incrementZone(tester, 1);
@@ -159,7 +164,12 @@ void main() {
   testWidgets('Applying reset updates the scores to 0 for both athletes', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MaterialApp(home: CounterPage()));
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => SettingsModel(),
+        child: const MaterialApp(home: CounterPage()),
+      ),
+    );
 
     // Simulate a match
     await incrementZone(tester, 0, increment: 2);
@@ -185,18 +195,15 @@ void main() {
   testWidgets(
     'Vibrate when adding a point if vibration is enabled, otherwise do nothing',
     (WidgetTester tester) async {
-      // Mock the Vibration class
+      final mockNoVibration = MockNoVibration();
+      final settings = SettingsModel(vibration: mockNoVibration);
 
-      final mockVibration = MockVibrationModel();
-      final settings = SettingsModel(vibrationModel: null);
-
-      // Provide the mock Vibration instance to the widget tree
       await tester.pumpWidget(
         MaterialApp(
           home: Consumer<SettingsModel>(
             builder: (context, theme, child) => CounterPage(),
           ),
-          // Provide the mock Vibration instance to the widget tree
+
           builder: (context, child) {
             return ChangeNotifierProvider(
               create: (_) => settings,
@@ -206,16 +213,17 @@ void main() {
         ),
       );
 
-      // Simulate a tap on the increment zone
+
       await incrementZone(tester, 0);
       await tester.pumpAndSettle();
-      verifyNever(mockVibration.doVibrate());
+      verify(mockNoVibration.performVibrate()).called(1);
 
+      final mockVibration = MockVibrationWithSettings();
       settings.update(vibrationModel: mockVibration);
 
       await incrementZone(tester, 0);
       await tester.pumpAndSettle();
-      verify(mockVibration.doVibrate()).called(1);
+      verify(mockVibration.performVibrate()).called(1);
     },
   );
 }

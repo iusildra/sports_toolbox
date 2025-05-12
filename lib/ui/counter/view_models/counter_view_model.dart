@@ -19,7 +19,7 @@ class CounterViewModel extends ChangeNotifier {
       _counterModel.updateAthleteSetup(athlete);
   void incrementScore(BuildContext context, int index) {
     _counterModel.incrementScore(index);
-    Provider.of<SettingsModel>(context, listen: false).performVibrate();
+    Provider.of<SettingsModel>(context, listen: false).vibration.performVibrate();
   }
 
   void addPenalty(Athlete athlete, PenaltyType penalty) =>
